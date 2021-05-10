@@ -27,10 +27,10 @@ defmodule IpaggregatorTest do
       "90.37.182.241" => 2
     }
 
-    assert Ipaggregator.Agregate.counter(ip_addresses) == expected_output
+    assert Ipaggregator.Agregate.check_duplication(ip_addresses) == expected_output
   end
 
   test "returns a empty map when ip_addresses list is empty" do
-    assert Ipaggregator.Agregate.counter([]) == %{}
+    assert Ipaggregator.Agregate.check_duplication([]) == %{}
   end
 end
