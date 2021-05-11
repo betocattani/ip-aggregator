@@ -29,25 +29,44 @@ defmodule Ipaggregator.Agregate do
     GenServer.start_link(__MODULE__, ip_addresses, name: __MODULE__)
   end
 
-  def counter(server_pid, ip_addresses) do
-    GenServer.call(server_pid, {:counter, ip_addresses})
+  def counter(pid, ip_addresses) do
+    GenServer.call(pid, {:counter, ip_addresses})
   end
 
-  def enqueue_ip(value) do
-    GenServer.cast(__MODULE__, {:enqueue_ip, value})
+  def view(pid) do
+    GenServer.call(pid, :view)
   end
 
-  @impl true
-  def init(ip_addresses), do: {:ok, ip_addresses}
-
-  @impl true
-  def handle_call(:counter, _from, ip_addresses) do
-    {:reply, __MODULE__.check_duplication(ip_addresses), ip_addresses}
+  def add(pid, ip_address) do
+    GenServer.cast(pid, ip_address)
   end
 
-  @impl true
-  def handle_cast({:enqueue_ip, value}, ip_addresses) do
-    {:noreply, ip_addresses ++ [value]}
+  def stop(pid) do
+    GenServer.stop(pid, :normal, :infinity)
+  end
+
+  def init (list) do
+    {:ok, list}
+  end
+
+  def handle_cast(new_ip_address, ip_addresses) do
+    updated_list = ip_addresses ++ [new_ip_address]
+    {:noreply, updated_list}
+  end
+
+  def handle_call(:view, _from, ip_addresses) do
+    {:reply, ip_addresses, ip_addresses}
+  end
+
+  def handle_call({:counter, ip_addresses}, _from, ip_addresses) do
+    ips_processed = __MODULE__.check_duplication(ip_addresses)
+    {:reply, ips_processed, ip_addresses}
+  end
+
+  def terminate(_reason, ip_addresses) do
+    IO.puts("Terminating verification")
+    IO.inspect(ip_addresses)
+    :ok
   end
 
   @doc """
