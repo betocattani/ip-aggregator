@@ -1,38 +1,31 @@
 # Ipaggregator
 
-**TODO: Add description**
+Elixir Gen server example to count how many times the IP is called inside a list
 
 ## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `ipaggregator` to your list of dependencies in `mix.exs`:
-
 ```elixir
-def deps do
-  [
-    {:ipaggregator, "~> 0.1.0"}
-  ]
-end
+$ git clone project
+$ cd project
+$ mix deps.get
 ```
 
-Exercise
+Running the code
 ```elixir
-ip_addresses = [
-  "1.2.3.4",
-  "1.2.3.4",
-  "3.4.5.6",
-  "10.1.0.38",
-  "90.37.182.241"
-]
+# Start the Gen Server
+{:ok, pid} = Ipaggregator.Agregate.start_link()
 
-{:ok, pid} = GenServer.start_link(Ipaggregator.Agregate, ip_addresses)
+# Add a new IP to the list
+Ipaggregator.Agregate.add(pid, "2.2.2.2")
+Ipaggregator.Agregate.add(pid, "1.2.3.4")
+Ipaggregator.Agregate.add(pid, "1.2.3.4")
+Ipaggregator.Agregate.add(pid, "10.1.0.38")
 
-GenServer.call(pid, :counter)
+# View list
+ip_addresses = Ipaggregator.Agregate.view(pid)
 
-GenServer.cast(pid, {:enqueue_ip, "2.2.2.2"})
+# Counter the IP's
+Ipaggregator.Agregate.counter(pid, ip_addresses)
+
+# Stop the Gen Sever
+Ipaggregator.Agregate.stop(pid)
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/ipaggregator](https://hexdocs.pm/ipaggregator).
-
