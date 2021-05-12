@@ -12,10 +12,14 @@ defmodule Ipaggregator.Agregate do
             "90.37.182.241"
           ]
 
-      iex> {:ok, pid} = GenServer.start_link(Ipaggregator.Agregate, ip_addresses)
+      iex> {:ok, pid} = Ipaggregator.Agregate.start_link()
       {:ok, #PID<0.217.0>}
 
-      iex> GenServer.call(pid, :counter)
+      iex> Ipaggregator.Agregate.add(pid, ip_addresses)
+
+      iex> list = Ipaggregator.Agregate.view(pid)
+
+      iex> Ipaggregator.Agregate.counter(pid, list)
       %{
         "1.2.3.4" => 2,
         "10.1.0.38" => 1,
@@ -23,6 +27,7 @@ defmodule Ipaggregator.Agregate do
         "90.37.182.241" => 1
       }
   """
+
   use GenServer
 
   def start_link(ip_addresses \\ []) do
@@ -49,8 +54,8 @@ defmodule Ipaggregator.Agregate do
     {:ok, list}
   end
 
-  def handle_cast(new_ip_address, ip_addresses) do
-    updated_list = ip_addresses ++ [new_ip_address]
+  def handle_cast(new_list, ip_addresses) do
+    updated_list = ip_addresses ++ new_list
     {:noreply, updated_list}
   end
 
