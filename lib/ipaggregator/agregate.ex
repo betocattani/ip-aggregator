@@ -50,7 +50,7 @@ defmodule Ipaggregator.Agregate do
     GenServer.stop(pid, :normal, :infinity)
   end
 
-  def init (list) do
+  def init(list) do
     {:ok, list}
   end
 
