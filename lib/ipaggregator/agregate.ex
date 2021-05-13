@@ -34,6 +34,27 @@ defmodule Ipaggregator.Agregate do
     GenServer.start_link(__MODULE__, ip_addresses, name: __MODULE__)
   end
 
+  @doc """
+  This function is responsible to iterate over the list and count
+  how many times the IP is called.
+
+  ## Examples
+      iex> ip_addresses = [
+        "1.2.3.4",
+        "1.2.3.4",
+        "3.4.5.6",
+        "10.1.0.38",
+        "90.37.182.241"
+      ]
+
+      iex> Ipaggregator.Agregate.counter(pid, ip_addresses)
+      %{
+        "1.2.3.4" => 2,
+        "10.1.0.38" => 1,
+        "3.4.5.6" => 1,
+        "90.37.182.241" => 1
+      }
+  """
   def counter(pid, ip_addresses) do
     GenServer.call(pid, {:counter, ip_addresses})
   end
@@ -64,7 +85,7 @@ defmodule Ipaggregator.Agregate do
   end
 
   def handle_call({:counter, ip_addresses}, _from, ip_addresses) do
-    ips_processed = __MODULE__.check_duplication(ip_addresses)
+    ips_processed = Enum.frequencies(ip_addresses)
     {:reply, ips_processed, ip_addresses}
   end
 
@@ -72,34 +93,5 @@ defmodule Ipaggregator.Agregate do
     IO.puts("Terminating verification")
     IO.inspect(ip_addresses)
     :ok
-  end
-
-  @doc """
-  This function is responsible to iterave over the list and count
-  how many times the IP is called.
-
-  ## Examples
-      iex> ip_addresses = [
-        "1.2.3.4",
-        "1.2.3.4",
-        "3.4.5.6",
-        "10.1.0.38",
-        "90.37.182.241"
-      ]
-
-      iex> Ipaggregator.Agregate.check_duplication(ip_addresses)
-      %{
-        "1.2.3.4" => 2,
-        "10.1.0.38" => 1,
-        "3.4.5.6" => 1,
-        "90.37.182.241" => 1
-      }
-  """
-  def check_duplication(ip_addresses) do
-    Enum.reduce(ip_addresses, %{}, &increment/2)
-  end
-
-  defp increment(ip, map) do
-    Map.update(map, ip, 1, &(&1 + 1))
   end
 end
