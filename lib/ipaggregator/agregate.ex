@@ -34,43 +34,6 @@ defmodule Ipaggregator.Agregate do
     GenServer.start_link(__MODULE__, ip_addresses, name: __MODULE__)
   end
 
-  @doc """
-  This function is responsible to iterate over the list and count
-  how many times the IP is called.
-
-  ## Examples
-      iex> ip_addresses = [
-        "1.2.3.4",
-        "1.2.3.4",
-        "3.4.5.6",
-        "10.1.0.38",
-        "90.37.182.241"
-      ]
-
-      iex> Ipaggregator.Agregate.counter(pid, ip_addresses)
-      %{
-        "1.2.3.4" => 2,
-        "10.1.0.38" => 1,
-        "3.4.5.6" => 1,
-        "90.37.182.241" => 1
-      }
-  """
-  def counter(pid, ip_addresses) do
-    GenServer.call(pid, {:counter, ip_addresses})
-  end
-
-  def view(pid) do
-    GenServer.call(pid, :view)
-  end
-
-  def add(pid, ip_address) do
-    GenServer.cast(pid, ip_address)
-  end
-
-  def stop(pid) do
-    GenServer.stop(pid, :normal, :infinity)
-  end
-
   def init(list) do
     {:ok, list}
   end

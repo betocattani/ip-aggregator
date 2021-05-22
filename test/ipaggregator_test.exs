@@ -2,11 +2,6 @@ defmodule IpaggregatorTest do
   use ExUnit.Case, async: true
   doctest Ipaggregator
 
-  test "start process" do
-    {:ok, pid} = Ipaggregator.Agregate.start_link()
-    assert Process.alive?(pid) == true
-  end
-
   test "returns a map of ip_addresses formated with the counter of each ip" do
     ip_addresses = [
       "1.2.3.4",
@@ -32,11 +27,11 @@ defmodule IpaggregatorTest do
       "90.37.182.241" => 2
     }
 
-    {:ok, pid} = Ipaggregator.Agregate.start_link()
-    Ipaggregator.Agregate.add(pid, ip_addresses)
-    list = Ipaggregator.Agregate.view(pid)
+    {:ok, pid} = Ipaggregator.start
+    Ipaggregator.add(pid, ip_addresses)
+    list = Ipaggregator.view(pid)
 
-    assert Ipaggregator.Agregate.counter(pid, list) == expected_output
+    assert Ipaggregator.counter(pid, list) == expected_output
   end
 
   test "view the IP's added in the GenServer state" do
@@ -53,10 +48,10 @@ defmodule IpaggregatorTest do
       "172.16.28.99"
     ]
 
-    {:ok, pid} = Ipaggregator.Agregate.start_link()
-    Ipaggregator.Agregate.add(pid, ip_addresses)
+    {:ok, pid} = Ipaggregator.start
+    Ipaggregator.add(pid, ip_addresses)
 
-    assert Ipaggregator.Agregate.view(pid) === ip_addresses
+    assert Ipaggregator.view(pid) === ip_addresses
   end
 
   test "add a new list of IP's in the state of the GenServer" do
@@ -71,19 +66,18 @@ defmodule IpaggregatorTest do
       "22.22.22.22" => 1
     }
 
-    {:ok, pid} = Ipaggregator.Agregate.start_link()
 
-    Ipaggregator.Agregate.add(pid, ip_addresses)
-    Ipaggregator.Agregate.add(pid, ["22.22.22.22"])
+    {:ok, pid} = Ipaggregator.start
+    Ipaggregator.add(pid, ip_addresses)
+    Ipaggregator.add(pid, ["22.22.22.22"])
 
-    list = Ipaggregator.Agregate.view(pid)
+    list = Ipaggregator.view(pid)
 
-    assert Ipaggregator.Agregate.counter(pid, list) == expected_output
+    assert Ipaggregator.counter(pid, list) == expected_output
   end
 
   test "returns a empty map when ip_addresses list is empty" do
-    {:ok, pid} = Ipaggregator.Agregate.start_link()
-
-    assert Ipaggregator.Agregate.counter(pid, []) == %{}
+    {:ok, pid} = Ipaggregator.start
+    assert Ipaggregator.counter(pid, []) == %{}
   end
 end
